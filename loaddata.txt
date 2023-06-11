@@ -1,0 +1,2 @@
+python manage.py loaddata dumpdata/categories.json
+python manage.py loaddata dumpdata/products.json
