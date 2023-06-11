@@ -4,8 +4,14 @@ from django.shortcuts import render
 
 
 def index(request):
-    return render(request, 'products/index.html')
+    context = {
+        'title': 'VirtuMart',
+    }
+    return render(request, 'products/index.html', context)
 
 
 def products(request):
-    return render(request, 'products/products.html')
+    context = {
+        'title': 'VirtuMart - Directory',
+    }
+    return render(request, 'products/products.html', context)
