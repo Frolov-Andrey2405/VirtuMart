@@ -1,0 +1,1 @@
+python manage.py dumpdata products.ProductCategory --indent 4 > categories.json
