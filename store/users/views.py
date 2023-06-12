@@ -7,12 +7,12 @@ from django.urls import reverse
 
 def login(request):
     if request.method == 'POST':
-        form = UserLoginForm(request.POST)
+        form = UserLoginForm(data=request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
+            username = request.POST['username']
+            password = request.POST['password']
             user = auth.authenticate(username=username, password=password)
-            if user is not None:
+            if user:
                 auth.login(request, user)
                 return HttpResponseRedirect(reverse('index'))
     else:
