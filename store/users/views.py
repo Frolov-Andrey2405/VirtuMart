@@ -1,7 +1,10 @@
+import requests
+
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib import auth
-from users.forms import UserLoginForm, UserRegistrationForm
+from users.forms import (
+    UserLoginForm, UserRegistrationForm, UserProfileForm)
 from django.urls import reverse
 
 
@@ -33,3 +36,32 @@ def registration(request):
 
     context = {'form': form}
     return render(request, 'users/registration.html', context)
+
+
+def profile(request):
+    if request.method == 'POST':
+        form = UserProfileForm(
+            data=request.POST, instance=request.user, files=request.FILES)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('users:profile'))
+    else:
+        form = UserProfileForm(instance=request.user)
+
+    # Checking for image link availability
+    if form.initial.get('image_url'):
+        image_url = form.initial['image_url']
+        try:
+            response = requests.get(image_url)
+            if response.status_code != 200:
+                # Using the standard image
+                form.initial['image_url'] = None
+        except requests.exceptions.RequestException:
+            # Using the standard image
+            form.initial['image_url'] = None
+
+    context = {
+        'title': 'VirtuMart - Profile',
+        'form': form
+    }
+    return render(request, 'users/profile.html', context)
