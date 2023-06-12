@@ -47,7 +47,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{% static 'users/login.html' %}"
+              <a class="nav-link" href="{% url 'users:login' %}"
                 >Log in <i class="fas fa-sign-in-alt"></i
               ></a>
             </li>
@@ -77,7 +77,7 @@
                     >Orders</a
                   >
                 </li>
-                <li><a class="dropdown-item" href="#">Admin Panel</a></li>
+                <li><a class="dropdown-item" href="{% url 'users:login' %}">Admin Panel</a></li>
                 <li>
                   <hr class="dropdown-divider" />
                 </li>
