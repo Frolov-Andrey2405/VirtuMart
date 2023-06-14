@@ -3,22 +3,25 @@
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-lg-7">
-        <div
-          class="alert alert-warning alert-dismissible fade show"
-          role="alert"
-          style="margin-top: 50px"
-        >
-          <strong>Discover a seamless shopping experience!</strong> Create an account today and shop hassle-free.
-          fields below.
-          <button
-            type="button"
-            class="close"
-            data-dismiss="alert"
-            aria-label="Close"
-          >
+        {% if form.errors %}
+        <div class="alert alert-danger" role="alert">
+          {{ form.errors }}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
+        {% endif %}
+
+        {% if not form.errors %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert" style="margin-top: 50px">
+          <strong>Discover a seamless shopping experience!</strong> Create an account today and shop hassle-free.
+          fields below.
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {% endif %}
+
         <div class="card shadow-lg border-0 rounded-lg mt-5">
           <div class="card-header">
             <h3 class="text-center font-weight-light my-4">Create an account</h3>
@@ -37,8 +40,7 @@
 
                 <div class="col-md-6">
                   <div class="form-group">
-                    <label class="small mb-1" for="{{form.last_name.id_for_label}}"
-                      >Last name</label>
+                    <label class="small mb-1" for="{{form.last_name.id_for_label}}">Last name</label>
                     {{ form.last_name }}
                   </div>
                 </div>
@@ -46,14 +48,12 @@
 
               <div class="form-row">
                 <div class="col-md-6">
-                  <label class="small mb-1" for="{{form.username.id_for_label}}"
-                    >Username</label>
+                  <label class="small mb-1" for="{{form.username.id_for_label}}">Username</label>
                   {{ form.username }}
                 </div>
 
                 <div class="col-md-6">
-                  <label class="small mb-1" for="{{form.email.id_for_label}}"
-                    >Email address</label>
+                  <label class="small mb-1" for="{{form.email.id_for_label}}">Email address</label>
                   {{ form.email }}
                 </div>
               </div>
@@ -68,19 +68,14 @@
 
                 <div class="col-md-6">
                   <div class="form-group">
-                    <label class="small mb-1" for="{{form.password2.id_for_label}}"
-                      >Confirm password</label>
+                    <label class="small mb-1" for="{{form.password2.id_for_label}}">Confirm password</label>
                     {{ form.password2 }}
                   </div>
                 </div>
               </div>
 
               <div class="form-group mt-4 mb-0">
-                <input
-                  class="btn btn-primary btn-block"
-                  type="submit"
-                  value="Create an account"
-                />
+                <input class="btn btn-primary btn-block" type="submit" value="Create an account" />
               </div>
             </form>
           </div>
