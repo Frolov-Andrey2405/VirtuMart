@@ -10,17 +10,21 @@
     </div>
     <ul class="list-group list-group-flush">
         <li class="list-group-item bg-light">
-            <div class="row text-center">
-                <div class="col-lg-4">
-                    <input name="basketID" type="number" class="form-control" value="{{ basket.quantity }}" min="0">
+            <form method="POST" action="{% url 'products:basket_update' basket.id %}" id="basket-form-{{ basket.id }}">
+                {% csrf_token %}
+                <div class="row text-center">
+                    <div class="col-lg-4">
+                        <input name="quantity" type="number" class="form-control basket-quantity-input"
+                            value="{{ basket.quantity }}" min="0">
+                    </div>
+                    <div class="col-lg-4">{{ basket.sum }} $</div>
+                    <div class="col-lg-4">
+                        <a href="{% url 'products:basket_remove' basket.id %}">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
                 </div>
-                <div class="col-lg-4">{{ basket.sum }} $</div>
-                <div class="col-lg-4">
-                    <a href="{% url 'products:basket_remove' basket.id %}">
-                        <i class="fas fa-trash"></i>
-                    </a>
-                </div>
-            </div>
+            </form>
         </li>
     </ul>
 </div>
@@ -34,8 +38,36 @@
 <a class="btn btn-success btn-lg float-right" href="">
     Place an order
 </a>
+
+<script>
+    // JavaScript code to automatically submit the form on quantity change
+    const quantityInputs = document.querySelectorAll('.basket-quantity-input');
+    quantityInputs.forEach(input => {
+        input.addEventListener('change', () => {
+            const form = input.closest('form');
+            form.submit();
+        });
+    });
+</script>
 {% else %}
 <h4 class="mt-3 mb-3 text-center">
     Cart is empty
 </h4>
 {% endif %}
+
+<script>
+    // JavaScript code to remove product from the list if quantity is 0
+    const productCards = document.querySelectorAll('.card');
+    productCards.forEach(card => {
+        const quantityInput = card.querySelector('.basket-quantity-input');
+        const form = card.querySelector('form');
+        if (quantityInput && form) {
+            quantityInput.addEventListener('change', () => {
+                if (parseInt(quantityInput.value) === 0) {
+                    form.submit();
+                    card.style.display = 'none';
+                }
+            });
+        }
+    });
+</script>

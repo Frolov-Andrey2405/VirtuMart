@@ -1,6 +1,7 @@
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 
 from products.models import Product, ProductCategory, Basket
 # Create your views here.
@@ -39,4 +40,17 @@ def basket_add(request, product_id):
 def basket_remove(request, basket_id):
     basket = Basket.objects.get(id=basket_id)
     basket.delete()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required
+@require_POST
+def basket_update(request, basket_id):
+    basket = Basket.objects.get(id=basket_id)
+    quantity = int(request.POST.get('quantity', 0))
+    if quantity == 0:
+        basket.delete()
+    else:
+        basket.quantity = quantity
+        basket.save()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
