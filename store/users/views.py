@@ -3,11 +3,15 @@ import requests
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib import auth, messages
-from users.forms import (
-    UserLoginForm, UserRegistrationForm, UserProfileForm)
+from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 
+from users.forms import (
+    UserLoginForm, UserRegistrationForm, UserProfileForm)
+from products.models import Basket
 
+
+@login_required
 def login(request):
     if request.method == 'POST':
         form = UserLoginForm(data=request.POST)
@@ -63,6 +67,7 @@ def profile(request):
 
     context = {
         'title': 'VirtuMart - Profile',
-        'form': form
+        'form': form,
+        'baskets': Basket.objects.filter(user=request.user),
     }
     return render(request, 'users/profile.html', context)
