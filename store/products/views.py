@@ -2,6 +2,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django.core.paginator import Paginator
 
 from products.models import Product, ProductCategory, Basket
 # Create your views here.
@@ -14,11 +15,17 @@ def index(request):
     return render(request, 'products/index.html', context)
 
 
-def products(request):
+def products(request, category_id=None, page_number=1):
+    products = Product.objects.filter(
+        category_id=category_id) if category_id else Product.objects.all()
+    per_page = 3
+    paginator = Paginator(products, per_page)
+    products_paginator = paginator.page(page_number)
+
     context = {
         'title': 'VirtuMart - Directory',
-        'products': Product.objects.all(),
         'categories': ProductCategory.objects.all(),
+        'products': products_paginator
     }
     return render(request, 'products/products.html', context)
 
