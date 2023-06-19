@@ -1,18 +1,20 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.views.generic.base import TemplateView
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
 
 from products.models import Product, ProductCategory, Basket
-# Create your views here.
 
 
-def index(request):
-    context = {
-        'title': 'VirtuMart',
-    }
-    return render(request, 'products/index.html', context)
+class IndexView(TemplateView):
+    template_name = 'products/index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(IndexView, self).get_context_data()
+        context['title'] = 'VirtuMart'
+        return context
 
 
 def products(request, category_id=None, page_number=1):
