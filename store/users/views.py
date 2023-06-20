@@ -2,72 +2,80 @@ import requests
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.contrib import auth, messages
-from django.contrib.auth.decorators import login_required
-from django.urls import reverse
 
-from users.forms import (
-    UserLoginForm, UserRegistrationForm, UserProfileForm)
+from django.contrib import messages
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+from django.urls import reverse_lazy, reverse
+from django.views.generic import TemplateView, CreateView, UpdateView
+
+from common.views import TitleMixin
 from products.models import Basket
+from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm
 
 
-@login_required
-def login(request):
-    if request.method == 'POST':
+class LoginView(TemplateView):
+    template_name = 'users/login.html'
+
+    def post(self, request, *args, **kwargs):
         form = UserLoginForm(data=request.POST)
         if form.is_valid():
-            username = request.POST['username']
-            password = request.POST['password']
-            user = auth.authenticate(username=username, password=password)
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
             if user:
-                auth.login(request, user)
+                login(request, user)
                 return HttpResponseRedirect(reverse('index'))
-    else:
-        form = UserLoginForm()
+        context = {'form': form}
+        return render(request, self.template_name, context)
 
-    context = {'form': form}
-    return render(request, 'users/login.html', context)
-
-
-def registration(request):
-    if request.method == 'POST':
-        form = UserRegistrationForm(data=request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Registration successful')
-            return HttpResponseRedirect(reverse('users:login'))
-    else:
-        form = UserRegistrationForm()
-
-    context = {'form': form}
-    return render(request, 'users/registration.html', context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = UserLoginForm()
+        return context
 
 
-def profile(request):
-    if request.method == 'POST':
-        form = UserProfileForm(
-            data=request.POST, instance=request.user, files=request.FILES)
-        if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse('users:profile'))
-    else:
-        form = UserProfileForm(instance=request.user)
+class RegistrationView(CreateView):
+    template_name = 'users/registration.html'
+    form_class = UserRegistrationForm
+    success_url = reverse_lazy('users:login')
 
-    # Checking for image link availability
-    if form.initial.get('image_url'):
-        image_url = form.initial['image_url']
-        try:
-            response = requests.get(image_url)
-            if response.status_code != 200:
-                # Using the standard image
-                form.initial['image_url'] = None
-        except requests.exceptions.RequestException:
-            # Using the standard image
-            form.initial['image_url'] = None
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, 'Registration successful')
+        return response
 
-    context = {
-        'title': 'VirtuMart - Profile',
-        'form': form,
-        'baskets': Basket.objects.filter(user=request.user),
-    }
-    return render(request, 'users/profile.html', context)
+
+class ProfileView(LoginRequiredMixin, TitleMixin, UpdateView):
+    template_name = 'users/profile.html'
+    form_class = UserProfileForm
+    title = 'VirtuMart - Profile'
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        return response
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        baskets = Basket.objects.filter(user=self.request.user)
+        context['baskets'] = baskets
+        return context
+
+    def get_initial(self):
+        initial = super().get_initial()
+        if initial.get('image_url'):
+            image_url = initial['image_url']
+            try:
+                response = requests.get(image_url)
+                if response.status_code != 200:
+                    initial['image_url'] = None
+            except requests.exceptions.RequestException:
+                initial['image_url'] = None
+        return initial
+
+    def get_success_url(self):
+        return reverse('users:profile')
