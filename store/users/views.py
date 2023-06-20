@@ -5,6 +5,7 @@ from django.shortcuts import render
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.views import LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from django.urls import reverse_lazy, reverse
@@ -79,3 +80,7 @@ class ProfileView(LoginRequiredMixin, TitleMixin, UpdateView):
 
     def get_success_url(self):
         return reverse('users:profile')
+
+
+class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy('index')
