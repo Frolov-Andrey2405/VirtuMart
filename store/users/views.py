@@ -13,7 +13,9 @@ from django.views.generic import TemplateView, CreateView, UpdateView
 
 from common.views import TitleMixin
 from products.models import Basket
+
 from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm
+from users.models import EmailVerification, User
 
 
 class LoginView(TemplateView):
@@ -84,3 +86,21 @@ class ProfileView(LoginRequiredMixin, TitleMixin, UpdateView):
 
 class CustomLogoutView(LogoutView):
     next_page = reverse_lazy('index')
+
+
+class EmailVerificationView(TitleMixin, TemplateView):
+    title = 'VirtuMart - Email Verification'
+    template_name = 'users/email_verification.html'
+
+    def get(self, request, *args, **kwargs):
+        code = kwargs['code']
+        user = User.objects.get(email=kwargs['email'])
+        email_verifications = EmailVerification.objects.filter(
+            user=user, code=code)
+
+        if email_verifications.exists() and not email_verifications.first().is_expired():
+            user.is_verified_email = True
+            user.save()
+            return super(EmailVerificationView, self).get(request, *args, **kwargs)
+        else:
+            return HttpResponseRedirect(reverse('index'))
