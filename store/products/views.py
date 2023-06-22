@@ -1,10 +1,10 @@
-from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from django.views.generic.base import TemplateView
-from django.views.generic import ListView
+from django.http import HttpResponseRedirect
 from django.views.decorators.http import require_POST
+from django.views.generic import ListView
+from django.views.generic.base import TemplateView
 
-from products.models import Product, ProductCategory, Basket
+from products.models import Basket, Product, ProductCategory
 
 
 class IndexView(TemplateView):

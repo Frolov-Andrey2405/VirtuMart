@@ -1,20 +1,15 @@
 import requests
-
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
-
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.views import LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
-
-from django.urls import reverse_lazy, reverse
-from django.views.generic import TemplateView, CreateView, UpdateView
+from django.contrib.auth.views import LogoutView
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+from django.urls import reverse, reverse_lazy
+from django.views.generic import CreateView, TemplateView, UpdateView
 
 from common.views import TitleMixin
-from products.models import Basket
-
-from users.forms import UserLoginForm, UserRegistrationForm, UserProfileForm
+from users.forms import UserLoginForm, UserProfileForm, UserRegistrationForm
 from users.models import EmailVerification, User
 
 
