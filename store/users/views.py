@@ -62,12 +62,6 @@ class ProfileView(LoginRequiredMixin, TitleMixin, UpdateView):
         response = super().form_valid(form)
         return response
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        baskets = Basket.objects.filter(user=self.request.user)
-        context['baskets'] = baskets
-        return context
-
     def get_initial(self):
         initial = super().get_initial()
         if initial.get('image_url'):
