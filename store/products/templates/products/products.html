@@ -1,4 +1,4 @@
-{% extends 'products/base.html' %} {% load static %} {% block css %}
+{% extends 'products/base.html' %} {% load static cache %} {% block css %}
 <link href="{% static 'vendor/css/products.css' %}" rel="stylesheet" />
 {% endblock css %} {% block content %}
 <div class="container">
@@ -43,6 +43,7 @@
       </div>
 
       <div class="row">
+        {% cache 30 object_list %}
         {% for product in products %}
         <div class="col-lg-4 col-md-6 mb-4">
           <div class="card h-100">
@@ -64,6 +65,8 @@
           </div>
         </div>
         {% endfor %}
+        {% endcache %}
+
       </div>
 
       <nav aria-label="Page navigation example">
