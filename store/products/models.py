@@ -1,8 +1,11 @@
+import stripe
+
 from django.db import models
+from django.conf import settings
 
 from users.models import User
 
-# Create your models here.
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 class ProductCategory(models.Model):
@@ -23,6 +26,8 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField(default=0)
     image_url = models.TextField(blank=True, null=True)
+    stripe_product_price_id = models.CharField(
+        max_length=128, null=True, blank=True)
     category = models.ForeignKey(to=ProductCategory, on_delete=models.CASCADE)
 
     class Meta:
@@ -31,6 +36,23 @@ class Product(models.Model):
 
     def __str__(self):
         return f'Product: {self.name} | Category: {self.category.name}'
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if not self.stripe_product_price_id:
+            stripe_product_price = self.create_stripe_product_price()
+            self.stripe_product_price_id = stripe_product_price['id']
+        super(Product, self).save(
+            force_insert=False,
+            force_update=False,
+            using=None,
+            update_fields=None)
+
+    def create_stripe_product_price(self):
+        stripe_product = stripe.Product.create(name=self.name)
+        stripe_product_price = stripe.Price.create(
+            product=stripe_product['id'], unit_amount=round(self.price * 100),
+            currency='usd')
+        return stripe_product_price
 
 
 class BasketQuerySet(models.QuerySet):
