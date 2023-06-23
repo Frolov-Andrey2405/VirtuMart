@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     # Apps
     'products',
     'users',
+    'orders',
 
     # OAuth
     'allauth',
