@@ -77,6 +77,9 @@ INSTALLED_APPS = [
 
     # Debug
     'debug_toolbar',
+
+    # Extensions
+    'django_extensions'
 ]
 
 MIDDLEWARE = [
