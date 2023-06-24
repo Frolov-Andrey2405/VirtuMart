@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    env_file:
+      - store/.env
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=virtu_mart
+      - POSTGRES_USER=store_username
+      - POSTGRES_PASSWORD=admin123
+
+  redis:
+    image: redis
