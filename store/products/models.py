@@ -1,7 +1,6 @@
 import stripe
-
-from django.db import models
 from django.conf import settings
+from django.db import models
 
 from users.models import User
 
@@ -80,8 +79,35 @@ class Basket(models.Model):
     created_timestamp = models.DateTimeField(auto_now_add=True)
     objects = BasketQuerySet.as_manager()
 
+    objects = BasketQuerySet.as_manager()
+
     def __str__(self):
         return f'Shopping cart for {self.user.username} | Product: {self.product.name}'
 
     def sum(self):
         return self.product.price * self.quantity
+
+    def de_json(self):
+        basket_item = {
+            'product_name': self.product.name,
+            'quantity': self.quantity,
+            'price': float(self.product.price),
+            'sum': float(self.sum()),
+        }
+        return basket_item
+
+    @classmethod
+    def create_or_update(cls, product_id, user):
+        baskets = Basket.objects.filter(user=user, product_id=product_id)
+
+        if not baskets.exists():
+            obj = Basket.objects.create(
+                user=user, product_id=product_id, quantity=1)
+            is_created = True
+            return obj, is_created
+        else:
+            basket = baskets.first()
+            basket.quantity += 1
+            basket.save()
+            is_crated = False
+            return basket, is_crated
