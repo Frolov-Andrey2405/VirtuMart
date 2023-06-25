@@ -1,12 +1,15 @@
 from django import forms
-from django.contrib.auth.forms import (AuthenticationForm, UserChangeForm,
-                                       UserCreationForm)
+from django.contrib.auth.forms import (
+    AuthenticationForm, UserChangeForm, UserCreationForm)
 
 from users.models import User
 from users.tasks import send_email_verification
 
 
 class UserLoginForm(AuthenticationForm):
+    '''
+    Form for user login
+    '''
     username = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control py-4',
         'placeholder': 'Enter your user name'}))
@@ -22,6 +25,9 @@ class UserLoginForm(AuthenticationForm):
 
 
 class UserRegistrationForm(UserCreationForm):
+    '''
+    Form for user registration
+    '''
     first_name = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control py-4',
         'placeholder': 'Enter a name'}))
@@ -53,12 +59,19 @@ class UserRegistrationForm(UserCreationForm):
             'email', 'password1', 'password2')
 
     def save(self, commit=True):
+        """
+        The save function is called when the form is submitted.
+        It saves the user to the database and sends an email verification link.
+        """
         user = super(UserRegistrationForm, self).save(commit=True)
         send_email_verification.delay(user.id)
         return user
 
 
 class UserProfileForm(UserChangeForm):
+    '''
+    Form for user profile
+    '''
     first_name = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control py-4'}))
 

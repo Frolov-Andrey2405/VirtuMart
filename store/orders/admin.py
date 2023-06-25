@@ -5,6 +5,9 @@ from orders.models import Order
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
+    '''
+    Django admin model for managing orders.
+    '''
     list_display = ('__str__', 'status')
     fields = (
         'id', 'created',

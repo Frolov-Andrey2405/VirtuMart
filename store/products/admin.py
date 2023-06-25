@@ -9,6 +9,9 @@ admin.site.register(ProductCategory)
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    '''
+    Admin interface for managing products.
+    '''
     list_display = ('name', 'price', 'quantity', 'category')
     fields = (
         'name', 'description', ('price', 'quantity'), 'image_url',
@@ -19,6 +22,9 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 class BasketAdmin(admin.TabularInline):
+    '''
+    Inline admin interface for managing baskets.
+    '''
     model = Basket
     fields = ('product', 'quantity', 'created_timestamp')
     readonly_fields = ('created_timestamp',)
